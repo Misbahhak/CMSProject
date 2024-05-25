@@ -2,6 +2,9 @@
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { signUp } from "next-auth-sanity/client";
+import { signIn, useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 const defaultFormData = {
     email: '',
@@ -19,19 +22,33 @@ const Auth = () => {
         setFormData({ ...formData, [name]: value });
     };
 
+    const {data: session} = useSession()
+    console.log(session);
+    
+    //login handler if someone is already registered
+    const loginHandler = async () =>{
+        try {
+            await signIn()
+            // push the user to the home page
+            
+        } catch (error) {
+            console.log(error)
+            toast.error("something went wrong")            
+        }
+    }
 
+    // for Sign up
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         try {
-            //   const user = await signUp(formData);
-            //   if (user) {
-            //     toast.success('Success. Please sign in');
-            //   }
+            const user = await signUp(formData);
+            if (user) {
+                toast.success('Success. Please sign in');
+            }
             console.log(formData);
         } catch (error) {
             console.log(error);
-            //   toast.error("Something wen't wrong");
+            toast.error("Something wen't wrong");
         } finally {
             setFormData(defaultFormData);
         }
@@ -49,12 +66,12 @@ const Auth = () => {
                     <p>OR</p>
                     <span className='inline-flex items-center'>
                         <AiFillGithub
-                            // onClick={loginHandler}
+                            onClick={loginHandler}
                             className='mr-3 text-4xl cursor-pointer text-black dark:text-white'
                         />{' '}
                         |
                         <FcGoogle
-                            // onClick={loginHandler}
+                            onClick={loginHandler}
                             className='ml-3 text-4xl cursor-pointer'
                         />
                     </span>
@@ -79,7 +96,7 @@ const Auth = () => {
                         required
                         className={inputStyles}
                     // value={formData.name}
-                    // onChange={handleInputChange}
+                        onChange={handleInputChange}
                     />
                     <input
                         type='password'
@@ -89,7 +106,7 @@ const Auth = () => {
                         minLength={6}
                         className={inputStyles}
                     // value={formData.password}
-                    // onChange={handleInputChange}
+                        onChange={handleInputChange}
                     />
 
                     <button
@@ -101,7 +118,7 @@ const Auth = () => {
                 </form>
 
                 <button
-                    //  onClick={loginHandler}
+                    onClick={loginHandler}
                     className='text-blue-700 underline'>
                     login
                 </button>
