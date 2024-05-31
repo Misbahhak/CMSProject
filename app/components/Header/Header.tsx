@@ -5,9 +5,12 @@ import { useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdDarkMode, MdOutlineLightMode } from "react-icons/md";
 import ThemeContext from "@/app/context/themeContext";
+import { useSession } from "next-auth/react";
 
 const Header = () => {
     const { darkTheme, setDarkTheme } = useContext(ThemeContext)
+
+    const {data : session} = useSession();
 
     return (
         <header className="bg-white border-gray-200 dark:bg-gray-900">
@@ -18,7 +21,7 @@ const Header = () => {
                 </Link>
                 <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
                     <ul className="flex flex-row font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                        <li className="md:self-center">
+                        <div className="md:self-center">
                             {darkTheme ?
                                 <MdOutlineLightMode className="cursor-pointer w-6 h-6 md:w-6 md:h-6"
                                     onClick={() => {
@@ -32,12 +35,28 @@ const Header = () => {
                                         localStorage.setItem("hotel-theme", "true")
                                     }}
                                 />}
-                        </li>
-                        <li className="md:self-center md:mt-0">
-                            <Link href='/auth'>
+                        </div>
+                        <div className="md:self-center md:mt-0">
+                            {session?.user ? (
+                                <Link href={`/users/${session.user.id }`}>
+                                    {session.user.image ? 
+                                    (   <div className="w-10 h-10 rounded-full overflow-hidden">
+                                        <Image  src={session.user.image} alt={session.user.name!} width={40} height={40} className="scale-animation img"/>
+                                        
+                                        </div> 
+                                    ) :
+                                    (
+                                        <FaUserCircle className="cursor-pointer w-6 h-6 md:w-6 md:h-6" />
+                                    )}
+                                
+                                </Link>
+                            ) : (
+                                <Link href='/auth'>
                                 <FaUserCircle className="cursor-pointer w-6 h-6 md:w-6 md:h-6" />
-                            </Link>
-                        </li>
+                                </Link>
+                            )}
+                            
+                        </div>
                     </ul>
                     {/* <!-- Dropdown menu --> */}
                     <div className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
