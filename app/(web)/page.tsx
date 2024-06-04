@@ -1,9 +1,20 @@
+import FeaturedRoom from "../components/FeaturedRooms/FeaturedRoom";
+import Gallery from "../components/Gallery/Gallery";
 import HeroSection from "../components/HeroSection,tsx/HeroSection";
+import NewsLetter from "../components/NewsLetter/NewsLetter";
+import PageSearch from "../components/PageSearch/PageSearch";
+import { getFeaturedRoom } from "../libs/apis";
 
-export default function Home() {
+export default async function Home() {
+  const featuredRoom = await getFeaturedRoom();
+
   return (
     <>
-      < HeroSection />
+      <HeroSection />
+      <PageSearch />
+      <FeaturedRoom featuredRoom={featuredRoom} />
+      <Gallery />
+      <NewsLetter />
     </>
   );
 }
