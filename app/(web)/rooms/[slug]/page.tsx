@@ -5,6 +5,8 @@ import { LiaFireExtinguisherSolid } from "react-icons/lia";
 import { AiOutlineMedicineBox } from "react-icons/ai";
 import { GiSmokeBomb } from "react-icons/gi";
 import { useState } from "react";
+import { getStripe } from "@/app/libs/stripe";
+import axios from "axios";
 
 import useSWR from "swr";
 import { getRoom } from "@/app/libs/apis";
@@ -42,6 +44,8 @@ const RoomDetails = (props: { params: { slug: string } }) => {
   if (!room) return <LoadingSpinner />;
 
   const handleBookNowClick = async () => {
+    console.log("handle boooknow clicked");
+
     if (!checkinDate || !checkoutDate)
       return toast.error("Please provide checkin / checkout date");
 
@@ -51,6 +55,33 @@ const RoomDetails = (props: { params: { slug: string } }) => {
     const numberOfDays = calcNumDays();
 
     const hotelRoomSlug = room.slug.current;
+
+    const stripe = await getStripe();
+
+    // when we call api/stripe we have made a route and there we have created a stripe session
+    try {
+      const { data: stripeSession } = await axios.post("/api/stripe", {
+        checkinDate,
+        checkoutDate,
+        adults,
+        children: noOfChildren,
+        numberOfDays,
+        hotelRoomSlug,
+      });
+
+      if (stripe) {
+        const result = await stripe.redirectToCheckout({
+          sessionId: stripeSession.id,
+        });
+
+        if (result.error) {
+          toast.error("Payment Failed");
+        }
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+      toast.error("An error occured");
+    }
   };
 
   const calcNumDays = () => {
@@ -156,25 +187,6 @@ const RoomDetails = (props: { params: { slug: string } }) => {
               handleBookNowClick={handleBookNowClick}
             />
           </div>
-
-          {/* <div className="md:col-span-4 rounded-xl shadow-lg dark:shadow dark:shadow-white sticky top-10 h-fit overflow-auto">
-            <BookRoomCta
-              discount={room.discount}
-              price={room.price}
-              specialNote={room.specialNote}
-              checkinDate={checkinDate}
-              setCheckinDate={setCheckinDate}
-              checkoutDate={checkoutDate}
-              setCheckoutDate={setCheckoutDate}
-              calcMinCheckoutDate={calcMinCheckoutDate}
-              adults={adults}
-              noOfChildren={noOfChildren}
-              setAdults={setAdults}
-              setNoOfChildren={setNoOfChildren}
-              isBooked={room.isBooked}
-              handleBookNowClick={handleBookNowClick}
-            />
-          </div> */}
         </div>
       </div>
     </div>
