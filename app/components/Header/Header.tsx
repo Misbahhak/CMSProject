@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 import { useContext, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdDarkMode, MdOutlineLightMode } from "react-icons/md";
@@ -91,7 +92,7 @@ const Header = () => {
                 <ul className="py-2" aria-labelledby="user-menu-button">
                   <li>
                     <Link
-                      href="#"
+                      href={`/users/${session?.user.id}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                       Dashboard
                     </Link>
@@ -113,6 +114,7 @@ const Header = () => {
                   <li>
                     <Link
                       href="#"
+                      onClick={() => signOut({ callbackUrl: "/" })}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                       Sign out
                     </Link>
