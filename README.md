@@ -56,6 +56,8 @@ yarn dev
 
 This will start the development server at http://localhost:3000.
 
+or you can access directly at https://cms-project-five-mocha.vercel.app/
+
 Sanity CMS (Backend)
 
 sanity start
